@@ -7,7 +7,6 @@
 **_files/
 **.rmarkdown
 ##ignore all data files
-**Data/
 .Rproj.user
 
 ##ignore jabba outputs
