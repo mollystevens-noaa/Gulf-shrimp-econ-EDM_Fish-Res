@@ -1,0 +1,62 @@
+---
+title: "Projecting economic scenarios in empirical dynamic models for Gulf of America brown shrimp"
+author: "Molly H. Stevens^1^, Stephan B. Munch^2^, Tanya L. Rogers^2^, Lisa E. Ailloud^1^, Christopher Liese^3^, Katie I. Siegfried^1^"
+date: today
+date-format: "MMMM YYYY"
+bibliography: references.bib
+bibliographystyle: apa
+format: 
+  docx:
+    toc: false
+    number-sections: true
+    number-depth: 4
+reference-doc: template_head5-pic_BSH.docx
+csl: american-fisheries-society.csl
+---
+
+*^1^NOAA Fisheries, Southeast Fisheries Science Center Sustainable Fisheries Division, Miami, FL* *^2^NOAA Fisheries, Southwest Fisheries Science Center, Santa Cruz, CA* *^3^NOAA Fisheries, Southeast Fisheries Science Center Social Science Research Group, Miami, FL*
+
+
+```{r setup, include=FALSE}
+####**INSTRUCTIONS**
+## Edit shrimp spp names in 'preamble' below and in 'template' file name above
+#### To edit the output format, edit (&save) "styles" from the "home" tab in the 'template' file
+#### Replace text and images in the header/footer (no other text in the template is retained)
+#"`r format(last-modified, '%B %d, %Y')` "
+
+##**Load Libraries, preamble**
+source(file='../pubs/_p0-libload.R')
+source(file='../pubs/_p0-preamble_BSH.R')
+source(file='../pubs/_p0-preamble_price.R')
+
+##**REFERENCING INSTRUCTIONS**
+##**NOTE must use sec- fig- tbl- etc for these to link appropriately**
+##Options to label sections as {#sec-label} in section header, reference as @sec-label
+##Similarly, figures are labeled as ![Caption](file.png){#fig-label}, reference as @fig-label
+##Tables are labeled below R chunk as #| label: tbl-name and reference as @tbl-name
+##To include the number without "Section" and "Figure" in the label, reference as [-@fig-label]
+
+
+```
+
+```{=comment}
+This is a comment that does not show up in the source code
+```
+
+# Abstract {.unnumbered}
+
+Empirical dynamic models (EDMs) have been shown to capture population dynamics of short-lived species better than traditional stock assessment methods, including surplus production and age-structured models.  Prediction accuracy of recently developed EDMs for brown shrimp abundance ($R^2$=0.70, out-of-sample $R^2$=0.36) vastly exceeds that of previous assessment models built in the Gulf of America. The Gulf shrimp fishery was once extremely profitable until emerging aquaculture trimmed costs and drove global prices down, resulting in reduced revenue and fleet consolidation. Attempts have been made through the years to segment the domestic market and push prices back up so the Gulf shrimp fleet can cover trawling costs. Strategies include premium labeling in the form of seafood certification or country of origin labeling, allowing consumers to distinguish between domestic and imported shrimp.  Here, we estimated size-specific harvest rates using observed ex-vessel and fuel prices ($R^2$=0.65) and re-fit the base EDM using these estimates.  Then, we simulated realistic economic projection scenarios including (1) baseline [2020-2022 average price], (2) continued competition with farmed imports [25\% decrease in price], (3) tariff-induced increase [25\% increase in price], (4) premium label product increase [50\% increase in price], and (5) harvest rate at brown shrimp maximum sustainable yield identified in the latest stock assessment for three fuel price scenarios [\$1.50, baseline 2020-22 average, and \$4.00].  The price EDM had improved prediction accuracy for brown shrimp abundance (out-of-sample $R^2$=0.43). No scenario resulted in a depleted population and the premium-label scenario resulted in over \$250 million increase in annual revenue.
+
+**Keywords:** fisheries management, population dynamics, short-lived species, nonlinear dynamics
+
+
+{{< include _p1-intro.qmd >}}
+
+{{< include _p2-methods.qmd >}}
+
+{{< include _p3-results.qmd >}}
+
+{{< include _p4-discussion.qmd >}}
+
+{{< include _p5-references.qmd >}}
+

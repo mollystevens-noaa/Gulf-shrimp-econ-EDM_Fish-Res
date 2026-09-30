@@ -1,0 +1,30 @@
+##ignore all .R files
+**.Rproj
+**.Rhistory
+**.Rproj.user
+##ignore all .html and quarto files (_files/)
+**.html
+**_files/
+**.rmarkdown
+##ignore all data files
+**Data/
+.Rproj.user
+
+##ignore jabba outputs
+**ModelDevelopment/JABBA/output/
+**ModelDevelopment/JABBA/output_1987sensrun/
+
+##ignore EDM outputs
+**ModelDevelopment/EDM/output**
+
+##ignore assesment draft .docx versions
+**AssessmentReport/drafts/
+**00-compile-report.docx
+**00-compile-report_PSH.docx
+**00-compile-report_BSH.docx
+**00-compile-report_WSH.docx
+**Assessment.docx
+
+##ignore addendum docx
+**00-compile-addendum.docx
+**ReviewWorkshop/drafts/

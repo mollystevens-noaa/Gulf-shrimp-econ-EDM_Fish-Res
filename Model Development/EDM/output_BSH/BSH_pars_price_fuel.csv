@@ -1,0 +1,10 @@
+"spp.run","fullrun","par","est","estt","grad","ind"
+"BSH_G20023_price_fuel","G20023_BSH1987_CPUEremovals_est_price_fuel_bshareT_SIZEYEAR2_E5_local_ytransgr2_sequential_nocov","phi1",0.710444962828143,-0.341863797037703,-4.88365077905587e-05,0
+"BSH_G20023_price_fuel","G20023_BSH1987_CPUEremovals_est_price_fuel_bshareT_SIZEYEAR2_E5_local_ytransgr2_sequential_nocov","phi2",0.0396989540933268,-3.22643043689229,-6.29852392762336e-06,0
+"BSH_G20023_price_fuel","G20023_BSH1987_CPUEremovals_est_price_fuel_bshareT_SIZEYEAR2_E5_local_ytransgr2_sequential_nocov","phi3",0.0239245076567556,-3.73285192046487,-6.96741610322764e-06,0
+"BSH_G20023_price_fuel","G20023_BSH1987_CPUEremovals_est_price_fuel_bshareT_SIZEYEAR2_E5_local_ytransgr2_sequential_nocov","phi4",0.168764760052815,-1.77924948607487,-3.37874136881403e-05,0
+"BSH_G20023_price_fuel","G20023_BSH1987_CPUEremovals_est_price_fuel_bshareT_SIZEYEAR2_E5_local_ytransgr2_sequential_nocov","phi5",0.0444229815688843,-3.11399834055134,-2.61251011424027e-05,0
+"BSH_G20023_price_fuel","G20023_BSH1987_CPUEremovals_est_price_fuel_bshareT_SIZEYEAR2_E5_local_ytransgr2_sequential_nocov","ve",0.231748588207492,-3.02449244673269,-0.00112853098333447,0
+"BSH_G20023_price_fuel","G20023_BSH1987_CPUEremovals_est_price_fuel_bshareT_SIZEYEAR2_E5_local_ytransgr2_sequential_nocov","sigma2",0.869013779257873,-1.55900334223174,-0.000148989905965193,0
+"BSH_G20023_price_fuel","G20023_BSH1987_CPUEremovals_est_price_fuel_bshareT_SIZEYEAR2_E5_local_ytransgr2_sequential_nocov","rho",0.976521223068629,3.72779717052389,-1.7583108097054e-06,0
+"BSH_G20023_price_fuel","G20023_BSH1987_CPUEremovals_est_price_fuel_bshareT_SIZEYEAR2_E5_local_ytransgr2_sequential_nocov","b",1,NA,NA,0

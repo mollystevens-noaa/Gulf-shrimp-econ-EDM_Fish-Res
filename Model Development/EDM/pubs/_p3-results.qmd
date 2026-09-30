@@ -1,0 +1,232 @@
+
+
+# Results
+
+## Economic Conditions
+
+Inflation-adjusted shrimp prices peaked in the late 1970s, fueling an investment boom in global aquaculture.  This influx in supply caused shrimp prices to generally trend downward for the last four decades (@fig-imp).  Imports into the United States surpassed domestic shrimp production in the Gulf by the early 1980s and are currently over five times the Gulf biomass production.  By 2023, 93% of shrimp consumed in the U.S. was imported, with 96% of imports being farmed shrimp [@liese_etal_2026].  Over the last two decades, volumes of imported small shrimp peaked and then substantially decreased, medium shrimp import volumes peaked and slightly decreased, while imports of large shrimp continued to increase--nearly doubling over the last decade. Imports have skewed toward larger shrimp, which command a higher price per pound than smaller shrimp. These developments are reflected in the import prices by size, driving the ex-vessel prices in the Gulf fishery, and thereby the fishing behavior of Gulf shrimpers and resulting domestic landings by size (@fig-imp).
+
+
+
+![Historical trends in U.S. and imported shrimp metrics. Shrimp prices peaked in the late 1970s (top panel), coinciding with a substantial increase in imports alongside a long-term plateau in domestic landings (second panel). Import volumes shifted increasingly toward large shrimp over time (third panel), with the same pattern observed in domestic landings (bottom panel).](./figs/lbs_size_price_grid_yr_pub.png){#fig-imp}
+
+
+## Predicting Harvest Rate from Price
+
+Domestic US ex-vessel shrimp prices and fuel prices were found to significantly affect the estimated harvest rate.  We were able to predict seasonal harvest rates and explain over 65\% of their total variation (@tbl-pricemod).  All coefficients in the harvest rate regression model were highly significant ($p<0.0001$).  The model is reported with the Large size class as the default intercept and slope for ex-vessel price, with additive terms for Medium and Small to apply the regression.  This results in positive slopes for Large (0.199) and Medium (0.057) shrimp with respect to ex-vessel price, meaning as ex-vessel prices increase, harvest rates for Large and Medium shrimp also increase (@fig-pricemod).  The slope for Small shrimp is approximately flat, meaning ex-vessel prices for Small shrimp do not influence the relative harvest rate applied to this portion of the population. The slope for fuel price is negative, so as fuel price increases, the harvest rate for all size classes decreases.
+
+
+
+```{r}
+#| label: tbl-pricemod
+#| tbl-cap: "Linear regression coefficients for predicting harvest rate as a function of fuel price and size-specific ex-vessel price. The Large size category serves as the reference category."
+#| echo: false
+#| warning: false
+#| message: false
+
+library(modelsummary)
+
+modelsummary(
+  pricemod_G, 
+  output = "flextable",
+  shape = term ~ statistic,     # Puts estimate and std. error side-by-side
+  stars = TRUE,                 # Replaces standard p-values with significance stars
+  statistic = c("std.error", "statistic"),      # Shows standard error under the estimate
+  coef_map = c(                 # coef_map controls both the ROW ORDER and the DISPLAY NAME
+      "(Intercept)"          = "B_0 Intercept",
+      "SIZEMedium"           = "B_0 Medium",
+      "SIZESmall"            = "B_0 Small",
+      "log(P_Fuel_Real)"     = "B_1 log(Fuel Price)",
+      "log(Price_GOM)"       = "B_2 log(Ex-vessel Price)",
+      "log(Price_GOM):SIZEMedium" = "B_2 log(Ex-vessel Price) : Medium",
+      "log(Price_GOM):SIZESmall"  = "B_2 log(Ex-vessel Price) : Small"
+  ))%>%
+  delete_rows(i = 1, part = "header") %>%
+  set_header_labels(
+    ` ` = "Term",
+    estimate = "Estimate",
+    std.error = "Std. Error",
+    statistic = "t-value"       
+  ) %>%
+  # 1. ADD GENEROUS PADDING TO EVERYTHING (Coefficients & Headers)
+  padding(padding = 4, part = "all") %>%
+  # 2. OVERRIDE PADDING ONLY FOR THE GOF ROWS TO COMPRESS THEM
+  padding(
+    i = ~ ` ` %in% c("Num.Obs.", "R2", "R2 Adj.", "AIC", "BIC", "Log.Lik.", "F", "RMSE"),
+    padding.top = 2, 
+    padding.bottom = 2
+  ) %>%
+  autofit() #%>%
+#set_table_properties(layout = "autofit", width = 1)
+
+```
+
+
+![A single, shared fuel price slope (B_1) is estimated across all combined observations (left panel), whereas size-class specific intercepts (B_0,size) and ex-vessel price slopes (B_2,size; fit via interaction terms) are faceted by size class (right panels: Large, Medium, Small). Points represent observed data, solid lines depict fitted regressions back-transformed into real space, and shading represents 95% confidence intervals; prediction intervals utilized here are marked by dashed grey lines.](./figs/BSH_glm_fig2.png){#fig-pricemod}
+
+
+
+## EDM Configurations
+
+Estimated parameters from the top-performing stock assessment model are shown in @tbl-pars as the Base Model. The function-space complexity of the estimated model is defined jointly by the length scales, which define the degree of nonlinearity in each dimension, and the covariance matrix, which defines how tightly the data fit the model (and subsequently how quickly the model may vary).  The estimated length scale parameters $\phi_{m}$ are all less than 1, and are linear and smooth for all populations in the model.  The pointwise prior variance was estimated to be `r round(top_pars[top_pars$par=='sigma2',]$est,3)` and exceeded the function process variance of `r round(top_pars[top_pars$par=='ve',]$est,3)`, indicating an informative model. The dynamic correlation of the model was `r round(top_pars[top_pars$par=='rho',]$est,3)`, indicating a high correlation between these data, as seen in @fig-cpueG.  These populations had a shared catchability, $q=$ `r round(top_pars[top_pars$par=='b',]$est,3)`, that translates fishery removals to the units of the SEAMAP survey (number of shrimp per trawl hour per million pounds of tails).
+
+The EDM incorporating ex-vessel and fuel price to predict harvest rate within the escapement term performed similarly. The catchability estimated in the base model, $q=0.402$, was required here to estimate the original harvest rates in the regression model described in the previous section. The pointwise prior variance of 0.869 exceeded the function process variance of 0.232, also indicating an informative model.  There were similar complexities in this model (all length scales <1) and a similar dynamic correlation among populations in the model (approaching 1).  
+
+
+```{r echo=FALSE}
+#| label: tbl-pars
+#| tbl-cap: Parameter estimates for the Gulf brown shrimp stock assessment (Base.Model) and the same model configuration with ex-vessel and fuel prices integrated in the escapement term (Price.Fuel.Model).
+
+#source(file='../AssessmentReport/00-preamble.R')
+
+top_pars_tab2 %>%
+  mutate(Best.Model = BSH_G20023,
+         Price.Fuel.Model=BSH_G20023_price_fuel,
+    Parameter =ifelse(par=='rho', 'DynamicCorrelation',
+          ifelse(par=='b', 'Catchability',
+          ifelse(par=='phi1', 'InverseLengthScale1',
+          ifelse(par=='phi2', 'InverseLengthScale2',
+          ifelse(par=='phi3', 'InverseLengthScale3',
+          ifelse(par=='phi4', 'InverseLengthScale4',
+          ifelse(par=='phi5', 'InverseLengthScale5',
+          ifelse(par=='ve', 'ProcessVariance',
+          ifelse(par=='sigma2', 'PointwisePriorVariance',
+                 'ERR')))))))))) %>%
+  select(Parameter, 
+         Base.Model=Best.Model,
+         Price.Fuel.Model) %>%
+  filter(Parameter!='Catchability')%>%
+  arrange((Parameter)) %>%
+  flextable::flextable( ) %>%
+        flextable::line_spacing(space = 0.5,
+            part = "body")%>%
+        colformat_double(j=c(2:3),digits=3) %>%      
+        align(j=c(2),part="all",align="center") %>%
+        autofit()
+
+
+```
+
+
+The $R^2$ statistics were similar for the baseline and price EDM configurations, both approximately 0.7 (@tbl-stats).  The price EDM outperformed the baseline EDM for prediction capability ($R^2_{scaled.out}=0.430$ vs $0.364$). This was driven by the superior predictive capability of the price EDM for Large shrimp ($R^2_{Large.out}=0.675$ vs $0.345$). The price model performed similarly for the other two size classes, but was slightly inferior compared to the base model for out-of-sample prediction of Medium and Small, where there is additional variance around these size classes (@fig-projectprice).  Directly using ex-vessel and fuel prices reduced the uncertainty in the Large shrimp and improved the fit statistics used for model selection. Both models predicted the newly observed data in the time series, 2023-2024, very well.  These data are shown in open circles in @fig-projectprice and were not included in any of the models presented here, but the projected pattern of the EDM models track them closely.
+
+
+```{r echo=FALSE}
+#| label: tbl-stats
+#| tbl-cap: Fit statistics for the Gulf brown shrimp stock assessment (Base.Model) and the same model configuration with ex-vessel and fuel prices integrated in the escapement term (Price.Fuel.Model).  Out-of-sample fit statistics are denoted by '_out' and primary R2 metrics are centered and scaled relative to size-class population means (scaled).  Population-specific fit statistics are also reported.
+
+
+top_fitstats2 %>%
+  mutate(Fit.Statistics=stats,
+         Best.Model = BSH_G20023,
+         Price.Fuel.Model=BSH_G20023_price_fuel) %>%
+  filter(stats=='R2scaled'|stats=='R2scaled_out'|#stats=='R2'|stats=='R2_out'|stats=='df'|
+           stats=='R2pop_Large'|stats=='R2pop_Medium'|stats=='R2pop_Small'|
+           stats=='R2pop_out_Large'|stats=='R2pop_out_Medium'|stats=='R2pop_out_Small') %>%
+  select(Fit.Statistics, 
+         Base.Model=Best.Model,
+         Price.Fuel.Model)%>%
+  mutate(Fit.Statistics=ifelse(
+    Fit.Statistics=='R2pop_Large','R2_Large',ifelse(
+    Fit.Statistics=='R2pop_out_Large','R2_Large_out',ifelse(
+      Fit.Statistics=='R2pop_Medium','R2_Medium',ifelse(
+      Fit.Statistics=='R2pop_out_Medium','R2_Medium_out',ifelse(
+        Fit.Statistics=='R2pop_Small','R2_Small',ifelse(
+        Fit.Statistics=='R2pop_out_Small','R2_Small_out',Fit.Statistics
+        )))))))%>%
+  flextable::flextable( ) %>%
+        flextable::line_spacing(space = 0.5,
+            part = "body")%>%
+        colformat_double(j=c(2:3),digits=3) %>%      
+        align(j=c(2),part="all",align="center") %>%
+        autofit()
+
+```
+
+
+![Empirical dynamic model fits for the baseline runs used in management and adapted to include ex-vessel and fuel prices to predict harvest rate (2020-2022 average). Solid points indicate observed CPUE data used in model fitting, while open circles represent out-of-sample observations (2023-2024) past the terminal year (vertical dashed line). Shaded regions represent the combined EDM pointwise prior and process model variance.](./figs/BSH_price_fuel_proj_err.png){#fig-projectprice}
+
+## Projection Scenarios
+
+Ex-vessel and fuel prices for projection scenarios alongside estimated harvest rates are reported in @tbl-scenario. The lowest estimated harvest rates were realized under the high fuel price (\$4.00) and increased farm competition (25\% reduction in ex-vessel price) scenario.  The highest harvest rates (aside from the MSY projection) were realized under the low fuel price (\$1.50) and premium labeling (50\% increase in ex-vessel price) scenario.  These followed logical progressions among scenarios where both decreasing fuel price and increasing ex-vessel price increased harvest rates.  The resulting impacts of these harvest rates on the population of this fast-growing species are similar and remain above the populations at MSY (@fig-pop-scenarios).  The landings obtained at each harvest rate is shown in @fig-land-scenarios, where landings increase with increasing harvest rates. Under the baseline fuel scenario, the MSY scenario yields the highest landings, followed by premium labeling, tariffs, baseline, and finally farmed competition.  Decreasing fuel price allows even more shrimp to be harvested under the ex-vessel price scenarios, and increasing fuel price reduces harvest rate for all scenarios, essentially shutting down the fishery (harvest rate approximating zero) under the scenario with increased farmed competition (@tbl-scenario, @fig-land-scenarios).
+
+
+```{r echo=FALSE}
+#| label: tbl-scenario
+#| tbl-cap: Ex-vessel prices ($/lb) and estimated harvest rates across economic projection scenarios and the maximum sustainable yield (MSY) benchmark. Scenarios for projections were defined as (1) baseline [2020-2022 average price], (2) continued competition with farmed shrimp [25% decrease in price], (3) tariff-induced increase [25% increase in price], (4) premium label product increase [50% increase in price], and (5) harvest rate at brown shrimp maximum sustainable yield identified in the latest stock assessment. Fuel price scenarios included low ($1.50), baseline (2020-2022 average, $2.42), and high ($4.00). Size-specific ex-vessel prices and resulting harvest rates are provided for each scenario combination.
+
+
+# 
+# library(dplyr)
+# library(tidyr)
+# library(flextable)
+
+scenarios %>%
+  mutate(
+  scenario = factor(scenario, 
+                         levels = c("farmed","status.quo", "tariffs" ,"label.premium","msy"), 
+                         labels = c("Farmed","Baseline", "Tariffs",  "Premium Label","MSY"))) %>%
+  # 1. Prepare the data
+  mutate(Size = SIZE,
+         Price = z1,
+         Fuel = z2,
+         Harvest.Rate = U,
+         #Fuel = fscenario,
+         Scenario = scenario) %>%
+  filter(Scenario != 'edm.noprice') %>%
+  select(Scenario, Fuel, Size, Price, Harvest.Rate) %>%
+  arrange(Scenario)%>%  ##order defined in factor above
+  arrange((Fuel))%>%
+  # 2. Reshape to Wide Format
+  # This creates one row per Scenario, with Size values as columns
+  pivot_wider(
+    names_from = Size, 
+    values_from = c(Price, Harvest.Rate),
+    names_sep = "_" # The underscore is crucial for the next step
+  ) %>%
+  # 3. Build the flextable
+  flextable() %>%
+  # 4. Create the two-tier header
+  # This splits "Price_X" into a top header "Price" and sub-header "X"
+  separate_header(split = "_") %>%
+  # 5. Reapply your aesthetics
+  line_spacing(space = 0.5, part = "body") %>%
+  # Note: Column indices have changed because the data is wide!
+  # j = -1 means "apply to all columns EXCEPT the first one (Scenario)"
+  colformat_double(j = -1, digits = 3) %>%  
+  colformat_double(j= c(2), prefix="$", digits=2)%>%
+  colformat_double(j= c(3:5), prefix="$", digits=3)%>%
+  align(j = 1, part = "all", align = "center") %>% 
+  align(j = -1, part = "all", align = "center") %>% 
+  # Draw a line to the right of the Scenario column
+  vline(j = "Scenario",  part = "all") %>%
+  vline(j = "Fuel",  part = "all") %>%
+  # Draw a line to the right of the LAST Price column.
+  # IMPORTANT: Replace "Price_Large" with the actual column name of 
+  # your last Size category (e.g., "Price_High", "Price_3", etc.)
+  vline(j = "Price_Small", part = "all") %>%
+  hline(i=c(4,9)) %>%
+  # Clean up any overlapping borders (best practice when adding custom borders)
+  fix_border_issues() %>%
+  autofit()
+
+```
+
+
+![Projections for brown shrimp populations under different fuel scenarios ($1.50, baseline 2020-22 average, and $4.00) and ex-vessel price scenarios including baseline (2020-22 average prices), farmed (25% reduction in prices), tariffs (25% increase in prices), label premium (50% increase in prices), and harvest rates associated with MSY. The MSY benchmark is shown only under baseline fuel conditions since these rates were estimated externally and fixed. The vertical dashed line marks Fall 2022, after which projection scenarios begin.](./figs/BSH_price_fuel_proj_scenario_size_func_POP.png){#fig-pop-scenarios}
+
+
+![Projections for brown shrimp landings under different fuel scenarios ($1.50, baseline 2020-22 average, and $4.00) and ex-vessel price scenarios including baseline (2020-22 average prices), farmed (25\% reduction in prices), tariffs (25\% increase in prices), label premium (50\% increase in prices), and harvest rates associated with MSY, which were only shown under the baseline fuel scenario since these rates were estimated externally and fixed. The vertical dashed line marks Fall 2022, after which projection scenarios begin.](./figs/BSH_price_fuel_proj_scenario_size_func_LAND_msy.png){#fig-land-scenarios}
+
+
+MSY is a fixed rate (0.265) that was included in these plots to establish simulated price scenarios relative to sustainable landings and brown shrimp population sizes. The Red Snapper Exclusion Zone was implemented in 2008, and the highest estimated effort in this zone in the Western Gulf from 10-30 fathoms occurred in 2014. The peak harvest rate estimated here since 2008 also occurred in 2014 and was estimated as 0.150, aggregated across brown shrimp sizes and seasons. The estimated harvest rate at MSY exceeds this proxy red snapper threshold, implying (with numerous simplifications across shrimp species, size classes, time, and space) that the MSY threshold is not the limiting management constraint.  Simulated economic scenarios do not exceed the simplified harvest rate realized in 2014 across all size classes, but may approach this limit individually.  MSY and further considerations of management constraints are excluded from the revenue projections, which show the dominant impact Large shrimp have on fishery income and viability (@fig-rev).  The differences in ex-vessel price scenarios are exacerbated here, since the ex-vessel price driving the increased harvest rate is multiplied by the realized landings to obtain revenue.  Fuel price scenarios affect outcomes solely through their impact on harvest rate as reported here, where decreased fuel prices result in increased harvest rates.  Total revenue across all size classes is shown under each fuel and ex-vessel price scenario in @fig-rev-all.
+
+
+![Estimates for recent and projected brown shrimp revenue under different fuel scenarios ($1.50, baseline 2020-22 average, and $4.00) and ex-vessel price scenarios including baseline (2020-22 average prices), farmed (25\% reduction in prices), tariffs (25\% increase in prices), and label premium (50\% increase in prices). The vertical dashed line marks Fall 2022, after which projection scenarios begin.](./figs/BSH_price_fuel_proj_scenario_size_func_REVENUE_grid3.png){#fig-rev}
+
+
+
+![Estimates for recent and projected brown shrimp total revenue under different price scenarios including baseline (2020-22 average prices), farmed (25\% reduction in prices), tariffs (25\% increase in prices), and label premium (50\% increase in prices). The vertical dashed line marks Fall 2022, after which projection scenarios begin.](./figs/BSH_price_proj_scenario_REVENUE_total.png){#fig-rev-all}
+
+
+
